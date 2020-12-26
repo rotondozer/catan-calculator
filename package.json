@@ -1,0 +1,25 @@
+{
+  "name": "catan-calculator",
+  "version": "1.0.0",
+  "description": "Know all your options based on your hand, and other stuff probably idk yet.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "catan",
+    "typescript",
+    "javascript"
+  ],
+  "author": "Nick Rotondo",
+  "license": "ISC",
+  "dependencies": {
+    "sums-up": "^2.2.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node12": "^1.0.7",
+    "eslint": "^7.16.0",
+    "prettier": "^2.2.1",
+    "typescript": "^4.1.3"
+  }
+}
