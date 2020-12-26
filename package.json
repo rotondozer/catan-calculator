@@ -4,7 +4,7 @@
   "description": "Know all your options based on your hand, and other stuff probably idk yet.",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "pretty": "npx prettier --write ."
   },
   "keywords": [
     "catan",

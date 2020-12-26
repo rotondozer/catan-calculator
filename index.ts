@@ -1,1 +1,0 @@
-const farts: string = "f a r t z z z z z z "
