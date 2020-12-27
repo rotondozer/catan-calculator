@@ -8,11 +8,7 @@ class Resource<T = never> extends SumType<{
   Wood: [string];
 }> {}
 
-const x = "a";
-const stuff = "";
-
-const card = new Resource("Wheat");
-const progressPercentage = card.caseOf({
-  Wheat: () => "I'm a what",
-  _: () => "",
-});
+function sum(a: number, b: number): number {
+  return a + b;
+}
+export { sum };
