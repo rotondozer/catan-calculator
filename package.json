@@ -4,7 +4,8 @@
   "description": "Know all your options based on your hand, and other stuff probably idk yet.",
   "main": "index.js",
   "scripts": {
-    "pretty": "npx prettier --write ."
+    "pretty": "npx prettier --write .",
+    "build": "tsc"
   },
   "keywords": [
     "catan",
@@ -18,6 +19,8 @@
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.7",
+    "@typescript-eslint/eslint-plugin": "^4.11.0",
+    "@typescript-eslint/parser": "^4.11.0",
     "eslint": "^7.16.0",
     "prettier": "^2.2.1",
     "typescript": "^4.1.3"
