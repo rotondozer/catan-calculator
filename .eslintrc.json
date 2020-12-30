@@ -22,5 +22,6 @@
     "no-cond-assign": ["error", "always"],
     // disable rules from base configurations
     "no-console": "off"
-  }
+  },
+  "ignorePatterns": ["**.test.js", "/tests/**", "build"]
 }
