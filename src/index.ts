@@ -1,4 +1,4 @@
-import { Hand, hasAtLeast, payFor, getAllBuildOptions } from "./hand";
+import { Hand } from "./hand";
 import * as BuildOption from "./build-option";
 
 interface TestScenario {
@@ -17,8 +17,7 @@ const testScenario: TestScenario = {
 
 function evaluateScenario({ hand }: TestScenario): Array<BuildOption.BuildOption> {
   console.log("TODO: evaluateScenario", hand);
-
-  return getAllBuildOptions(hand);
+  return [];
 }
 
 evaluateScenario(testScenario);

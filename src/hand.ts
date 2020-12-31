@@ -35,7 +35,7 @@ class Handy {
       Err: e => new Handy(Err(e)),
       Ok: h => {
         const result = h[key] - n;
-        return result < 0 ? new Handy(Err("insufficient" + key)) : new Handy(Ok({ ...h, [key]: result }));
+        return result < 0 ? new Handy(Err(`insufficient ${key}`)) : new Handy(Ok({ ...h, [key]: result }));
       },
     });
   }
@@ -62,19 +62,6 @@ export function newHand(overwrites: Partial<Hand> = {}): Hand {
   };
 }
 
-export function hasAtLeast(n: number, key: keyof Hand, hand: Hand): boolean {
-  return hand[key] >= n;
-}
-
-export function remove(n: number, key: keyof Hand, hand: Hand): Result<Error, Hand> {
-  const result = hand[key] - n;
-  if (result < 0) {
-    return Err(`Missing ${Math.abs(result)} ${hand[key]} resources`);
-  } else {
-    return Ok({ ...hand, [key]: result });
-  }
-}
-
 export function payFor(buildOption: BuildOption, h: Hand): Result<Error, Hand> {
   const hand = Handy.fromHand(h);
   return buildOption.caseOf({
@@ -86,9 +73,22 @@ export function payFor(buildOption: BuildOption, h: Hand): Result<Error, Hand> {
   });
 }
 
+function hasAtLeast(n: number, key: keyof Hand, hand: Hand): boolean {
+  return hand[key] >= n;
+}
+
+function remove(n: number, key: keyof Hand, hand: Hand): Result<Error, Hand> {
+  const result = hand[key] - n;
+  if (result < 0) {
+    return Err(`Missing ${Math.abs(result)} ${hand[key]} resources`);
+  } else {
+    return Ok({ ...hand, [key]: result });
+  }
+}
+
 const BUILD_OPTS = [City(), DevCard(), Road(), Settlement()];
 
-export function getAllBuildOptions(hand: Hand): Array<BuildOption> {
+function getAllBuildOptions(hand: Hand): Array<BuildOption> {
   const buildOpts = BUILD_OPTS.filter(opt => canBuild(opt, hand));
 
   if (buildOpts.length === 0) return [None()];
@@ -104,5 +104,18 @@ function canBuild(buildOption: BuildOption, h: Hand): boolean {
     DevCard: () => has(1, "wheat") && has(1, "ore") && has(1, "sheep"),
     City: () => has(2, "wheat") && has(3, "ore"),
     None: () => false, // TODO
+  });
+}
+
+/**
+ * Recursively keep building the same thing until the hand is empty.
+ */
+export function buildMax(buildOpt: BuildOption, hand: Hand): Hand {
+  return payFor(buildOpt, hand).caseOf({
+    Err: err => {
+      console.log("buildMax tapping out with", err);
+      return hand;
+    },
+    Ok: hand => buildMax(buildOpt, hand),
   });
 }

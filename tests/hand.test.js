@@ -1,5 +1,5 @@
 const { Result, Ok, Err } = require("seidr");
-const { payFor, newHand } = require("../build/hand");
+const { payFor, newHand, buildMax } = require("../build/hand");
 const { City, Road, Settlement, DevCard, None } = require("../build/build-option");
 
 describe("hand", () => {
@@ -19,6 +19,17 @@ describe("hand", () => {
     });
     test("DevCard", () => {
       expect(payFor(DevCard(), newHand({ ore: 1, wheat: 1, sheep: 1 }))).toEqual(emptyHand);
+    });
+  });
+
+  describe("buildMax", () => {
+    test("basic", () => {
+      const hand = newHand({ wood: 10, brick: 10 });
+      expect(buildMax(Road(), hand)).toEqual(newHand());
+    });
+    test("with leftovers", () => {
+      const hand = newHand({ wood: 11, brick: 10 });
+      expect(buildMax(Road(), hand)).toEqual(newHand({ wood: 1 }));
     });
   });
 });
