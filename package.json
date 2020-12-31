@@ -16,6 +16,7 @@
   "author": "Nick Rotondo",
   "license": "ISC",
   "dependencies": {
+    "seidr": "^1.8.0",
     "sums-up": "^2.2.0"
   },
   "devDependencies": {
