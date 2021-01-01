@@ -1,10 +1,10 @@
 import { BuildOption, City, Road, Settlement, DevCard, None } from "./build-option";
-import { Result, Ok, Err } from "seidr";
+import { Result, Ok, Err, Maybe } from "seidr";
 import { BuildCounter } from "./build-counter";
 
 type Error = string;
 
-export interface Hand {
+export interface IHand {
   wheat: number;
   wood: number;
   brick: number;
@@ -12,37 +12,56 @@ export interface Hand {
   sheep: number;
 }
 
-class Handy {
-  hand: Result<Error, Hand>; // do I assume this is always in a valid state?
+class Hand {
+  hand: Result<Error, IHand>; // do I assume this is always in a valid state?
 
-  constructor(h?: Result<Error, Hand>) {
-    this.hand = h || Ok(newHand());
+  constructor(t?: IHand | Error) {
+    if (t) {
+      this.hand = this.isHand(t) ? Ok(t) : Err(t);
+    } else {
+      this.hand = Ok(this.init());
+    }
   }
 
-  public static fromHand(h: Hand): Handy {
-    return new Handy(Ok(h)); // TODO: validate here?
+  private isHand(t: IHand | Error): t is IHand {
+    return (t as IHand).brick !== undefined;
   }
 
-  /**
-   * show the hand after performing a series of actions to reveal
-   * the Result type.
-   */
-  public getResult(): Result<Error, Hand> {
-    return this.hand;
+  private init(overwrites: Partial<IHand> = {}): IHand {
+    // idk if this is necessary, just adding as many checks as possible.
+    const hasInvalid = Object.values(overwrites).some(v => v && v < 0);
+    if (hasInvalid) {
+      console.warn("you done something wrong, overwrites include NEGATIVE NUMBERS");
+      return EMPTY_HAND;
+    }
+    return {
+      ...EMPTY_HAND,
+      ...overwrites,
+    };
   }
 
-  public remove(n: number, key: keyof Hand): Handy {
+  public payFor(buildOption: BuildOption): Hand {
+    return buildOption.caseOf({
+      None: () => this,
+      Road: () => this.remove(1, "brick").remove(1, "wood"),
+      Settlement: () => this.remove(1, "sheep").remove(1, "wheat").remove(1, "brick").remove(1, "wood"),
+      City: () => this.remove(3, "ore").remove(2, "wheat"),
+      DevCard: () => this.remove(1, "wheat").remove(1, "sheep").remove(1, "ore"),
+    });
+  }
+
+  public remove(n: number, key: keyof IHand): Hand {
     return this.hand.caseOf({
-      Err: e => new Handy(Err(e)),
+      Err: e => new Hand(e),
       Ok: h => {
         const result = h[key] - n;
-        return result < 0 ? new Handy(Err(`insufficient ${key}`)) : new Handy(Ok({ ...h, [key]: result }));
+        return result < 0 ? new Hand(`insufficient ${key}`) : new Hand({ ...h, [key]: result });
       },
     });
   }
 }
 
-const EMPTY_HAND: Hand = {
+const EMPTY_HAND: IHand = {
   wheat: 0,
   wood: 0,
   brick: 0,
@@ -50,7 +69,7 @@ const EMPTY_HAND: Hand = {
   sheep: 0,
 };
 
-export function newHand(overwrites: Partial<Hand> = {}): Hand {
+export function newHand(overwrites: Partial<IHand> = {}): IHand {
   // idk if this is necessary, just adding as many checks as possible.
   const hasInvalid = Object.values(overwrites).some(v => v && v < 0);
   if (hasInvalid) {
@@ -63,33 +82,19 @@ export function newHand(overwrites: Partial<Hand> = {}): Hand {
   };
 }
 
-export function payFor(buildOption: BuildOption, h: Hand): Result<Error, Hand> {
-  const hand = Handy.fromHand(h);
+export function payFor(buildOption: BuildOption, h: IHand): Result<Error, IHand> {
+  const hand = new Hand(h);
   return buildOption.caseOf({
     None: () => Err("None"),
-    Road: () => hand.remove(1, "brick").remove(1, "wood").getResult(),
-    Settlement: () => hand.remove(1, "sheep").remove(1, "wheat").remove(1, "brick").remove(1, "wood").getResult(),
-    City: () => hand.remove(3, "ore").remove(2, "wheat").getResult(),
-    DevCard: () => hand.remove(1, "wheat").remove(1, "sheep").remove(1, "ore").getResult(),
+    Road: () => hand.remove(1, "brick").remove(1, "wood").hand,
+    Settlement: () => hand.remove(1, "sheep").remove(1, "wheat").remove(1, "brick").remove(1, "wood").hand,
+    City: () => hand.remove(3, "ore").remove(2, "wheat").hand,
+    DevCard: () => hand.remove(1, "wheat").remove(1, "sheep").remove(1, "ore").hand,
   });
 }
 
-function hasAtLeast(n: number, key: keyof Hand, hand: Hand): boolean {
-  return hand[key] >= n;
-}
-
-function remove(n: number, key: keyof Hand, hand: Hand): Result<Error, Hand> {
-  const result = hand[key] - n;
-  if (result < 0) {
-    // TODO: resource type
-    return Err(`Missing ${Math.abs(result)} ${hand[key]} resources`);
-  } else {
-    return Ok({ ...hand, [key]: result });
-  }
-}
-
-function canBuild(buildOption: BuildOption, h: Hand): boolean {
-  const has = (n: number, k: keyof Hand) => hasAtLeast(n, k, h);
+function canBuild(buildOption: BuildOption, h: IHand): boolean {
+  const has = (n: number, k: keyof IHand) => h[k] >= n;
 
   return buildOption.caseOf({
     Road: () => has(1, "brick") && has(1, "wood"),
@@ -102,7 +107,7 @@ function canBuild(buildOption: BuildOption, h: Hand): boolean {
 
 interface BuildResult {
   count: BuildCounter;
-  hand: Hand;
+  hand: IHand;
 }
 /**
  * Recursively keep building the same thing until the hand is empty.

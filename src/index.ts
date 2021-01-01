@@ -1,8 +1,8 @@
-import { Hand } from "./hand";
+import { IHand } from "./hand";
 import * as BuildOption from "./build-option";
 
 interface TestScenario {
-  hand: Hand;
+  hand: IHand;
 }
 const testScenario: TestScenario = {
   hand: {
