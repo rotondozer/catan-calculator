@@ -1,3 +1,4 @@
+import { Maybe } from "seidr";
 import SumType from "sums-up";
 
 export class BuildOption extends SumType<{
@@ -12,8 +13,19 @@ export class BuildOption extends SumType<{
       Road: () => "road",
       Settlement: () => "settlement",
       City: () => "city",
-      DevCard: () => "development card",
+      DevCard: () => "devCard",
       None: () => "none",
+    });
+  }
+
+  public getNum(): number {
+    const getNum_ = (n?: number) => n || 0;
+    return this.caseOf({
+      Road: getNum_,
+      Settlement: getNum_,
+      City: getNum_,
+      DevCard: getNum_,
+      None: () => 0,
     });
   }
 }

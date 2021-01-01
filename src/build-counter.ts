@@ -1,20 +1,29 @@
+import { Maybe } from "seidr";
 import * as BuildOption from "./build-option";
 
-type BuildCount = Set<BuildOption.BuildOption>;
+type BuildCount = Array<BuildOption.BuildOption>;
 
 export class BuildCounter {
-  public build: BuildCount;
+  public builds: BuildCount;
 
   constructor(fromBuild?: BuildCount) {
-    this.build = new Set(fromBuild);
+    this.builds = Maybe.fromNullable(fromBuild).getOrElse([]);
   }
 
   public add(buildOpt: BuildOption.BuildOption): BuildCounter {
-    const updatedBuildOpt = buildOpt.caseOf({
-      _: (n = 0) => BuildOption[buildOpt.type](n + 1),
-      None: () => buildOpt,
+    const numToAdd = buildOpt.getNum();
+    const BuildOpt = BuildOption[buildOpt.type];
+
+    const updatedBuildCount = this.findBuildOpt(buildOpt).caseOf({
+      Nothing: () => this.builds.concat(BuildOpt(numToAdd)),
+      Just: opt => this.builds.filter(bo => bo.type !== opt.type).concat(BuildOpt(opt.getNum() + numToAdd)),
     });
-    const newBuildCount = new Set([...this.build, updatedBuildOpt]);
-    return new BuildCounter(newBuildCount);
+
+    return new BuildCounter(updatedBuildCount);
+  }
+
+  private findBuildOpt(buildOpt: BuildOption.BuildOption): Maybe<BuildOption.BuildOption> {
+    const existingBuildOpt = this.builds.find(opt => opt.kind === buildOpt.kind);
+    return Maybe.fromNullable(existingBuildOpt);
   }
 }

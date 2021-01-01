@@ -3,10 +3,14 @@ const { BuildOption, Road } = require("../build/build-option");
 
 describe("build count", () => {
   test("constuction paper", () => {
-    expect(new BuildCounter().build).toEqual(new Set());
-    expect(new BuildCounter(new Set([Road()])).build).toEqual(new Set([Road()]));
+    expect(new BuildCounter().builds).toEqual([]);
+    expect(new BuildCounter([Road()]).builds).toEqual([Road()]);
+    expect(new BuildCounter([Road(1)]).builds).toEqual([Road(1)]);
   });
-  test("addToBuildCount", () => {
-    expect(new BuildCounter().add(Road(1)).build).toEqual(new Set([Road(1)]));
+  test("adding to new BuildCounter instance", () => {
+    expect(new BuildCounter().add(Road(1)).builds).toEqual([Road(1)]);
+  });
+  test("updating existing BuildCounter BuildOption", () => {
+    expect(new BuildCounter([Road(1)]).add(Road(1)).builds).toEqual([Road(2)]);
   });
 });
