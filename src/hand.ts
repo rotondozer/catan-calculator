@@ -1,5 +1,6 @@
 import { BuildOption, City, Road, Settlement, DevCard, None } from "./build-option";
 import { Result, Ok, Err } from "seidr";
+import { BuildCounter } from "./build-counter";
 
 type Error = string;
 
@@ -80,19 +81,11 @@ function hasAtLeast(n: number, key: keyof Hand, hand: Hand): boolean {
 function remove(n: number, key: keyof Hand, hand: Hand): Result<Error, Hand> {
   const result = hand[key] - n;
   if (result < 0) {
+    // TODO: resource type
     return Err(`Missing ${Math.abs(result)} ${hand[key]} resources`);
   } else {
     return Ok({ ...hand, [key]: result });
   }
-}
-
-const BUILD_OPTS = [City(), DevCard(), Road(), Settlement()];
-
-function getAllBuildOptions(hand: Hand): Array<BuildOption> {
-  const buildOpts = BUILD_OPTS.filter(opt => canBuild(opt, hand));
-
-  if (buildOpts.length === 0) return [None()];
-  else return buildOpts;
 }
 
 function canBuild(buildOption: BuildOption, h: Hand): boolean {
@@ -107,15 +100,20 @@ function canBuild(buildOption: BuildOption, h: Hand): boolean {
   });
 }
 
+interface BuildResult {
+  count: BuildCounter;
+  hand: Hand;
+}
 /**
  * Recursively keep building the same thing until the hand is empty.
  */
-export function buildMax(buildOpt: BuildOption, hand: Hand): Hand {
+export function buildMax(buildOpt: BuildOption, buildResult: BuildResult): BuildResult {
+  const { hand, count } = buildResult;
   return payFor(buildOpt, hand).caseOf({
     Err: err => {
       console.log("buildMax tapping out with", err);
-      return hand;
+      return { hand, count };
     },
-    Ok: hand => buildMax(buildOpt, hand),
+    Ok: hand => buildMax(buildOpt, { hand, count: count.add(buildOpt) }),
   });
 }

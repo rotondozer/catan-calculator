@@ -1,24 +1,34 @@
 import SumType from "sums-up";
 
 export class BuildOption extends SumType<{
-  Settlement: [];
-  City: [];
-  DevCard: [];
-  Road: [];
+  Settlement: [number?];
+  City: [number?];
+  DevCard: [number?];
+  Road: [number?];
   None: [];
-}> {}
+}> {
+  public toString(): string {
+    return this.caseOf({
+      Road: () => "road",
+      Settlement: () => "settlement",
+      City: () => "city",
+      DevCard: () => "development card",
+      None: () => "none",
+    });
+  }
+}
 
-export function Road(): BuildOption {
-  return new BuildOption("Road");
+export function Road(n?: number): BuildOption {
+  return new BuildOption("Road", n);
 }
-export function Settlement(): BuildOption {
-  return new BuildOption("Settlement");
+export function Settlement(n?: number): BuildOption {
+  return new BuildOption("Settlement", n);
 }
-export function City(): BuildOption {
-  return new BuildOption("City");
+export function City(n?: number): BuildOption {
+  return new BuildOption("City", n);
 }
-export function DevCard(): BuildOption {
-  return new BuildOption("DevCard");
+export function DevCard(n?: number): BuildOption {
+  return new BuildOption("DevCard", n);
 }
 export function None(): BuildOption {
   return new BuildOption("None");
