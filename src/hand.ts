@@ -1,6 +1,6 @@
-import { BuildOption, City, Road, Settlement, DevCard, None } from "./build-option";
-import { Result, Ok, Err, Maybe } from "seidr";
-import { BuildCounter } from "./build-counter";
+import { BuildOption } from "./build-option";
+import { Result, Ok, Err } from "seidr";
+import { BuildQueue } from "./build-queue";
 
 type Error = string;
 
@@ -12,19 +12,19 @@ export interface IHand {
   sheep: number;
 }
 
-class Hand {
-  hand: Result<Error, IHand>; // do I assume this is always in a valid state?
+export class Hand {
+  hand: Result<Error, IHand>;
 
-  constructor(t?: IHand | Error) {
+  constructor(t?: Partial<IHand> | Error) {
     if (t) {
-      this.hand = this.isHand(t) ? Ok(t) : Err(t);
+      this.hand = this.isErr(t) ? Err(t) : Ok(this.init(t));
     } else {
       this.hand = Ok(this.init());
     }
   }
 
-  private isHand(t: IHand | Error): t is IHand {
-    return (t as IHand).brick !== undefined;
+  private isErr(t: Partial<IHand> | Error): t is Error {
+    return typeof t === "string";
   }
 
   private init(overwrites: Partial<IHand> = {}): IHand {
@@ -59,6 +59,19 @@ class Hand {
       },
     });
   }
+
+  /**
+   * sorta like a Maybe.getOrElse, but with a set default
+   */
+  public showOrEmpty(defaults?: IHand): IHand {
+    return this.hand.caseOf({
+      Err: err => {
+        console.warn("Calling `show` on Err hand", err);
+        return defaults || EMPTY_HAND;
+      },
+      Ok: h => h,
+    });
+  }
 }
 
 const EMPTY_HAND: IHand = {
@@ -82,17 +95,6 @@ export function newHand(overwrites: Partial<IHand> = {}): IHand {
   };
 }
 
-export function payFor(buildOption: BuildOption, h: IHand): Result<Error, IHand> {
-  const hand = new Hand(h);
-  return buildOption.caseOf({
-    None: () => Err("None"),
-    Road: () => hand.remove(1, "brick").remove(1, "wood").hand,
-    Settlement: () => hand.remove(1, "sheep").remove(1, "wheat").remove(1, "brick").remove(1, "wood").hand,
-    City: () => hand.remove(3, "ore").remove(2, "wheat").hand,
-    DevCard: () => hand.remove(1, "wheat").remove(1, "sheep").remove(1, "ore").hand,
-  });
-}
-
 function canBuild(buildOption: BuildOption, h: IHand): boolean {
   const has = (n: number, k: keyof IHand) => h[k] >= n;
 
@@ -106,19 +108,18 @@ function canBuild(buildOption: BuildOption, h: IHand): boolean {
 }
 
 interface BuildResult {
-  count: BuildCounter;
-  hand: IHand;
+  count: BuildQueue;
+  hand: Hand;
 }
 /**
  * Recursively keep building the same thing until the hand is empty.
  */
 export function buildMax(buildOpt: BuildOption, buildResult: BuildResult): BuildResult {
-  const { hand, count } = buildResult;
-  return payFor(buildOpt, hand).caseOf({
+  return buildResult.hand.payFor(buildOpt).hand.caseOf({
     Err: err => {
       console.log("buildMax tapping out with", err);
-      return { hand, count };
+      return buildResult;
     },
-    Ok: hand => buildMax(buildOpt, { hand, count: count.add(buildOpt) }),
+    Ok: h => buildMax(buildOpt, { hand: new Hand(h), count: buildResult.count.add(buildOpt) }),
   });
 }
