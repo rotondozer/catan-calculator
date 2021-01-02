@@ -120,6 +120,10 @@ export function buildMax(buildOpt: BuildOption, buildResult: BuildResult): Build
       console.log("buildMax tapping out with", err);
       return buildResult;
     },
-    Ok: h => buildMax(buildOpt, { hand: new Hand(h), count: buildResult.count.add(buildOpt) }),
+    Ok: h =>
+      buildMax(buildOpt, {
+        hand: new Hand(h),
+        count: buildResult.count.add(buildOpt),
+      }),
   });
 }

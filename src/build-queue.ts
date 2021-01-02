@@ -13,8 +13,6 @@ export class BuildQueue {
   }
 
   private combineAdjacents(queue_: Queue): Queue {
-    console.log("~~~~~ queue_ ===", queue_);
-
     if (queue_.length === 0) {
       return queue_; // this is how the loop ends: when there aren't any elements ahead
     }

@@ -28,7 +28,6 @@ describe("BuildQueue", () => {
         City(1),
         Settlement(10),
       ]);
-      console.log("THING", thing.queue);
       expect(thing.queue).toEqual([Road(2), City(3), Road(2), Settlement(4), City(1), Settlement(10)]);
     });
   });
