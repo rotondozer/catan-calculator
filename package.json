@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "Nick Rotondo",
 	"license": "ISC",
-	"description": "Know all your options based on your hand, and other stuff probably idk yet.",
+	"description": "Settlers of Catan game logic library",
 	"main": "build/index.js",
 	"scripts": {
 		"build": "npm run lint; tsc",
