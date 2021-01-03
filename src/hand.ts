@@ -23,30 +23,15 @@ export class Hand {
 	private _hand: Result<Error, IHand>;
 
 	constructor(t?: Partial<IHand> | Error) {
-		if (t) {
-			this._hand = this.isErr(t) ? Err(t) : Ok(this.init(t));
+		this._hand = isErr(t) ? Err(t) : this.initHand(t);
+	}
+
+	private initHand(overwrites: Partial<IHand> = {}): Result<Error, IHand> {
+		if (hasNegativeNums(overwrites)) {
+			return Err("negative resources");
 		} else {
-			this._hand = Ok(this.init());
+			return Ok({ ...EMPTY_HAND, ...overwrites });
 		}
-	}
-
-	private isErr(t: Partial<IHand> | Error): t is Error {
-		return typeof t === "string";
-	}
-
-	private init(overwrites: Partial<IHand> = {}): IHand {
-		// TODO: this should probably construct an Err hand instead
-		const hasInvalid = Object.values(overwrites).some((v) => v && v < 0);
-		if (hasInvalid) {
-			console.warn(
-				"you done something wrong, overwrites include NEGATIVE NUMBERS"
-			);
-			return EMPTY_HAND;
-		}
-		return {
-			...EMPTY_HAND,
-			...overwrites,
-		};
 	}
 
 	public bankTrade(resourceOut: keyof IHand, resourceIn: keyof IHand): Hand {
@@ -88,16 +73,12 @@ export class Hand {
 		});
 	}
 
-	/**
-	 * reveal the Result hand
-	 */
+	/** reveal the Result hand */
 	public show(): Result<Error, IHand> {
 		return this._hand;
 	}
 
-	/**
-	 * sorta like a Maybe.getOrElse, but with a set default
-	 */
+	/** sorta like a Maybe.getOrElse, but with a set default */
 	public showOrEmpty(defaults?: IHand): IHand {
 		return this._hand.caseOf({
 			Err: (err) => {
@@ -109,19 +90,13 @@ export class Hand {
 	}
 }
 
-export function newHand(overwrites: Partial<IHand> = {}): IHand {
-	// idk if this is necessary, just adding as many checks as possible.
-	const hasInvalid = Object.values(overwrites).some((v) => v && v < 0);
-	if (hasInvalid) {
-		console.warn(
-			"you done something wrong, overwrites include NEGATIVE NUMBERS"
-		);
-		return EMPTY_HAND;
-	}
-	return {
-		...EMPTY_HAND,
-		...overwrites,
-	};
+function isErr(t?: Partial<IHand> | Error): t is Error {
+	return typeof t === "string";
+}
+
+/** invalid if any negative numbers */
+function hasNegativeNums(hand: Partial<IHand>): boolean {
+	return Object.values(hand).some((v) => v && v < 0)
 }
 
 interface BuildResult {

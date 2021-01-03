@@ -16,11 +16,10 @@ describe("Hand", () => {
     test("with no parameters (Ok)", () => {
       expect(new Hand().show()).toEqual(Ok(EMPTY_HAND));
     });
-    it("handles invalid resource amounts (negative numbers)", () => {
+    it("handles negative numbers by initiating an Err hand", () => {
       const invalidHand = new Hand({ wheat: -1 });
-      expect(invalidHand.show()).toEqual(Ok(EMPTY_HAND));
+      expect(invalidHand.show()).toEqual(Err("negative resources"));
     });
-    it.todo("handles negative numbers by initiating an Err hand");
   });
 
   describe("payFor()", () => {
