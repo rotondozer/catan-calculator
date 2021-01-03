@@ -13,13 +13,13 @@ export interface IHand {
 }
 
 export class Hand {
-  hand: Result<Error, IHand>;
+  private _hand: Result<Error, IHand>;
 
   constructor(t?: Partial<IHand> | Error) {
     if (t) {
-      this.hand = this.isErr(t) ? Err(t) : Ok(this.init(t));
+      this._hand = this.isErr(t) ? Err(t) : Ok(this.init(t));
     } else {
-      this.hand = Ok(this.init());
+      this._hand = Ok(this.init());
     }
   }
 
@@ -28,7 +28,7 @@ export class Hand {
   }
 
   private init(overwrites: Partial<IHand> = {}): IHand {
-    // idk if this is necessary, just adding as many checks as possible.
+    // TODO: this should probably construct an Err hand instead
     const hasInvalid = Object.values(overwrites).some(v => v && v < 0);
     if (hasInvalid) {
       console.warn("you done something wrong, overwrites include NEGATIVE NUMBERS");
@@ -38,6 +38,11 @@ export class Hand {
       ...EMPTY_HAND,
       ...overwrites,
     };
+  }
+
+  public bankTrade(resourceOut: keyof IHand, resourceIn: keyof IHand): Hand {
+    // get trade rate (adjust for ports)
+    return this.remove(4, resourceOut).add(1, resourceIn);
   }
 
   public payFor(buildOption: BuildOption): Hand {
@@ -50,21 +55,35 @@ export class Hand {
     });
   }
 
-  public remove(n: number, key: keyof IHand): Hand {
-    return this.hand.caseOf({
+  public add(n: number, resource: keyof IHand): Hand {
+    return this._hand.caseOf({
+      Err: () => this,
+      Ok: hand => new Hand({ ...hand, [resource]: hand[resource] + n }),
+    });
+  }
+
+  public remove(n: number, resource: keyof IHand): Hand {
+    return this._hand.caseOf({
       Err: e => new Hand(e),
       Ok: h => {
-        const result = h[key] - n;
-        return result < 0 ? new Hand(`insufficient ${key}`) : new Hand({ ...h, [key]: result });
+        const result = h[resource] - n;
+        return result < 0 ? new Hand(`insufficient ${resource}`) : new Hand({ ...h, [resource]: result });
       },
     });
+  }
+
+  /**
+   * reveal the Result hand
+   */
+  public show(): Result<Error, IHand> {
+    return this._hand;
   }
 
   /**
    * sorta like a Maybe.getOrElse, but with a set default
    */
   public showOrEmpty(defaults?: IHand): IHand {
-    return this.hand.caseOf({
+    return this._hand.caseOf({
       Err: err => {
         console.warn("Calling `show` on Err hand", err);
         return defaults || EMPTY_HAND;
@@ -115,15 +134,18 @@ interface BuildResult {
  * Recursively keep building the same thing until the hand is empty.
  */
 export function buildMax(buildOpt: BuildOption, buildResult: BuildResult): BuildResult {
-  return buildResult.hand.payFor(buildOpt).hand.caseOf({
-    Err: err => {
-      console.log("buildMax tapping out with", err);
-      return buildResult;
-    },
-    Ok: h =>
-      buildMax(buildOpt, {
-        hand: new Hand(h),
-        count: buildResult.count.add(buildOpt),
-      }),
-  });
+  return buildResult.hand
+    .payFor(buildOpt)
+    .show()
+    .caseOf({
+      Err: err => {
+        console.log("buildMax tapping out with", err);
+        return buildResult;
+      },
+      Ok: h =>
+        buildMax(buildOpt, {
+          hand: new Hand(h),
+          count: buildResult.count.add(buildOpt),
+        }),
+    });
 }

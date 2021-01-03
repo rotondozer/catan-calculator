@@ -24,16 +24,6 @@ export class BuildOption extends SumType<{
     return this.kind === "None" ? this : new BuildOption(this.kind, this.getNum() + n);
   }
 
-  public toString(): string {
-    return this.caseOf({
-      Road: () => "road",
-      Settlement: () => "settlement",
-      City: () => "city",
-      DevCard: () => "devCard",
-      None: () => "none",
-    });
-  }
-
   public getNum(): number {
     const getNum_ = (n: number) => n;
     return this.caseOf({
