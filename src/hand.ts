@@ -42,15 +42,15 @@ export class Hand {
 	public payFor(buildOption: BuildOption): Hand {
 		return buildOption.caseOf({
 			None: () => this,
-			Road: () => this.remove(1, "brick").remove(1, "wood"),
-			Settlement: () =>
-				this.remove(1, "sheep")
-					.remove(1, "wheat")
-					.remove(1, "brick")
-					.remove(1, "wood"),
-			City: () => this.remove(3, "ore").remove(2, "wheat"),
-			DevCard: () =>
-				this.remove(1, "wheat").remove(1, "sheep").remove(1, "ore"),
+			Road: (qty) => this.remove(qty * 1, "brick").remove(qty * 1, "wood"),
+			Settlement: (qty) =>
+				this.remove(qty * 1, "sheep")
+					.remove(qty * 1, "wheat")
+					.remove(qty * 1, "brick")
+					.remove(qty * 1, "wood"),
+			City: (qty) => this.remove(qty * 3, "ore").remove(qty * 2, "wheat"),
+			DevCard: (qty) =>
+				this.remove(qty * 1, "wheat").remove(qty * 1, "sheep").remove(qty * 1, "ore"),
 		});
 	}
 
@@ -64,11 +64,11 @@ export class Hand {
 	public remove(n: number, resource: keyof IHand): Hand {
 		return this._hand.caseOf({
 			Err: (e) => new Hand(e),
-			Ok: (h) => {
-				const result = h[resource] - n;
+			Ok: (hand) => {
+				const result = hand[resource] - n;
 				return result < 0
 					? new Hand(`insufficient ${resource}`)
-					: new Hand({ ...h, [resource]: result });
+					: new Hand({ ...hand, [resource]: result });
 			},
 		});
 	}

@@ -24,6 +24,10 @@ describe("Hand", () => {
 
   describe("payFor()", () => {
     const emptyHand = new Hand();
+    test("errors if insufficient resources", () => {
+      const hand = new Hand({ ore: 2, wheat: 2 });
+      expect(hand.payFor(City(1))).toEqual(new Hand("insufficient ore"));
+    });
     test("None", () => {
       expect(new Hand().payFor(None())).toEqual(emptyHand);
     });
@@ -43,6 +47,16 @@ describe("Hand", () => {
       const hand = new Hand({ ore: 1, wheat: 1, sheep: 1 });
       expect(hand.payFor(DevCard(1))).toEqual(emptyHand);
     });
+    describe("with greater than one buildOption", () => {
+      it("errors if insufficient resources", () => {
+        const hand = new Hand({ ore: 9, wheat: 5 });
+        expect(hand.payFor(City(3))).toEqual(new Hand("insufficient wheat"));
+      })
+      it("applies the multiplier when removing resources", () => {
+        const hand = new Hand({ ore: 12, wheat: 8 });
+        expect(hand.payFor(City(4))).toEqual(emptyHand);
+      });
+    })
   });
 
   describe("remove()", () => {
