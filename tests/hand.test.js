@@ -24,37 +24,57 @@ describe("Hand", () => {
 
   describe("payFor()", () => {
     const emptyHand = new Hand();
-    test("errors if insufficient resources", () => {
-      const hand = new Hand({ ore: 2, wheat: 2 });
-      expect(hand.payFor(City(1))).toEqual(new Hand("insufficient ore"));
-    });
     test("None", () => {
       expect(new Hand().payFor(None())).toEqual(emptyHand);
     });
-    test("City", () => {
-      const hand = new Hand({ ore: 3, wheat: 2 });
-      expect(hand.payFor(City(1))).toEqual(emptyHand);
-    });
-    test("Road", () => {
-      const hand = new Hand({ brick: 1, wood: 1 });
-      expect(hand.payFor(Road(1))).toEqual(emptyHand);
-    });
-    test("Settlement", () => {
-      const hand = new Hand({ brick: 1, wood: 1, sheep: 1, wheat: 1 });
-      expect(hand.payFor(Settlement(1))).toEqual(emptyHand);
-    });
-    test("DevCard", () => {
-      const hand = new Hand({ ore: 1, wheat: 1, sheep: 1 });
-      expect(hand.payFor(DevCard(1))).toEqual(emptyHand);
-    });
-    describe("with greater than one buildOption", () => {
-      it("errors if insufficient resources", () => {
+
+    describe("with qty === 1", () => {
+      test("errors if insufficient resources", () => {
+        const hand = new Hand({ ore: 2, wheat: 2 });
+        expect(hand.payFor(City(1))).toEqual(new Hand("insufficient ore"));
+      });
+      test("City", () => {
+        const hand = new Hand({ ore: 3, wheat: 2 });
+        expect(hand.payFor(City(1))).toEqual(emptyHand);
+      });
+      test("Road", () => {
+        const hand = new Hand({ brick: 1, wood: 1 });
+        expect(hand.payFor(Road(1))).toEqual(emptyHand);
+      });
+      test("Settlement", () => {
+        const hand = new Hand({ brick: 1, wood: 1, sheep: 1, wheat: 1 });
+        expect(hand.payFor(Settlement(1))).toEqual(emptyHand);
+      });
+      test("DevCard", () => {
+        const hand = new Hand({ ore: 1, wheat: 1, sheep: 1 });
+        expect(hand.payFor(DevCard(1))).toEqual(emptyHand);
+      });
+    })
+    
+    describe("qtih qty > 1", () => {
+      test("Err building City if insufficient wheat", () => {
         const hand = new Hand({ ore: 9, wheat: 5 });
         expect(hand.payFor(City(3))).toEqual(new Hand("insufficient wheat"));
       })
-      it("applies the multiplier when removing resources", () => {
+      test("Err building Settlement if insufficient wood", () => {
+        const hand = new Hand({ brick: 2, wood: 1, sheep: 2, wheat: 2 });
+        expect(hand.payFor(Settlement(2))).toEqual(new Hand("insufficient wood"));
+      })
+      test("City", () => {
         const hand = new Hand({ ore: 12, wheat: 8 });
         expect(hand.payFor(City(4))).toEqual(emptyHand);
+      });
+      test("Road", () => {
+        const hand = new Hand({ brick: 5, wood: 5 });
+        expect(hand.payFor(Road(5))).toEqual(emptyHand);
+      });
+      test("Settlement", () => {
+        const hand = new Hand({ brick: 2, wood: 2, sheep: 2, wheat: 2 });
+        expect(hand.payFor(Settlement(2))).toEqual(emptyHand);
+      });
+      test("DevCard", () => {
+        const hand = new Hand({ ore: 1, wheat: 1, sheep: 1 });
+        expect(hand.payFor(DevCard(1))).toEqual(emptyHand);
       });
     })
   });
