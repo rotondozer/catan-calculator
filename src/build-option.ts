@@ -25,6 +25,7 @@ export class BuildOption extends SumType<{
   }
 
   public getNum(): number {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const getNum_ = (n: number) => n;
     return this.caseOf({
       Road: getNum_,
