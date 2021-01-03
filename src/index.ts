@@ -1,5 +1,5 @@
 import { IHand } from "./hand";
-import * as BuildOption from "./build-option";
+import * as BuildOption from "./build_option";
 
 interface TestScenario {
   hand: IHand;

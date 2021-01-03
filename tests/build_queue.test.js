@@ -1,5 +1,5 @@
-const { BuildQueue } = require("../build/build-queue");
-const { Road, City, Settlement } = require("../build/build-option");
+const { BuildQueue } = require("../build/build_queue");
+const { Road, City, Settlement } = require("../build/build_option");
 
 describe("BuildQueue", () => {
   describe("constructor()", () => {

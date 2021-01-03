@@ -1,6 +1,6 @@
-import { BuildOption } from "./build-option";
+import { BuildOption } from "./build_option";
 import { Result, Ok, Err } from "seidr";
-import { BuildQueue } from "./build-queue";
+import { BuildQueue } from "./build_queue";
 
 type Error = string;
 // TODO: get rid of Resource sumType?

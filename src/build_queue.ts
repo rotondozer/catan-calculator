@@ -1,5 +1,5 @@
 import { Maybe } from "seidr";
-import * as BuildOption from "./build-option";
+import * as BuildOption from "./build_option";
 
 const maybe = Maybe.fromNullable;
 

@@ -1,7 +1,7 @@
 const { Result, Ok, Err } = require("seidr");
 const { Hand, buildMax } = require("../build/hand");
-const { City, Road, Settlement, DevCard, None } = require("../build/build-option");
-const { BuildQueue } = require("../build/build-queue");
+const { City, Road, Settlement, DevCard, None } = require("../build/build_option");
+const { BuildQueue } = require("../build/build_queue");
 
 const EMPTY_HAND = { wheat: 0, wood: 0, brick: 0, sheep: 0, ore: 0 };
 
