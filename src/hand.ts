@@ -3,6 +3,8 @@ import { Result, Ok, Err } from "seidr";
 import { BuildQueue } from "./build-queue";
 
 type Error = string;
+// TODO: get rid of Resource sumType?
+type Resource = keyof IHand;
 
 export interface IHand {
 	wheat: number;
@@ -34,7 +36,7 @@ export class Hand {
 		}
 	}
 
-	public bankTrade(resourceOut: keyof IHand, resourceIn: keyof IHand): Hand {
+	public bankTrade(resourceOut: Resource, resourceIn: Resource): Hand {
 		// get trade rate (adjust for ports)
 		return this.remove(4, resourceOut).add(1, resourceIn);
 	}

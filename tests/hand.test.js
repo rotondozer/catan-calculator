@@ -28,6 +28,16 @@ describe("Hand", () => {
       expect(new Hand().payFor(None())).toEqual(emptyHand);
     });
 
+    describe("with qty === 0", () => {
+      const bigHand = new Hand({ ore: 20, wheat: 20, brick: 20, wood: 20, sheep: 20 });
+      it("returns the Hand unchanged", () => {
+        expect(bigHand.payFor(City())).toEqual(bigHand);
+        expect(bigHand.payFor(Settlement(0))).toEqual(bigHand);
+        expect(bigHand.payFor(Road())).toEqual(bigHand);
+        expect(bigHand.payFor(DevCard(0))).toEqual(bigHand);
+      });
+    })
+
     describe("with qty === 1", () => {
       test("errors if insufficient resources", () => {
         const hand = new Hand({ ore: 2, wheat: 2 });
@@ -51,7 +61,7 @@ describe("Hand", () => {
       });
     })
     
-    describe("qtih qty > 1", () => {
+    describe("wih qty > 1", () => {
       test("Err building City if insufficient wheat", () => {
         const hand = new Hand({ ore: 9, wheat: 5 });
         expect(hand.payFor(City(3))).toEqual(new Hand("insufficient wheat"));
@@ -104,6 +114,22 @@ describe("Hand", () => {
       expect(okHand).toEqual(new Hand({ brick: 1 }));
     });
   });
+
+  describe("bankTrade()", () => {
+    test.todo("with ports");
+    test("Err if insufficient resources", () => {
+      const hand = new Hand({ sheep: 3 })
+      expect(hand.bankTrade("sheep", "wood")).toEqual(new Hand("insufficient sheep"));
+    });
+    test("Sheep @ default trade rates w/ leftover", () => {
+      const hand = new Hand({ sheep: 5 })
+      expect(hand.bankTrade("sheep", "wood")).toEqual(new Hand({ sheep: 1, wood: 1 }));
+    });
+    test("Sheep @ default trade rates", () => {
+      const hand = new Hand({ sheep: 4 })
+      expect(hand.bankTrade("sheep", "wood")).toEqual(new Hand({ sheep: 0, wood: 1 }));
+    });
+  })
 
   describe("buildMax", () => {
     let count;
