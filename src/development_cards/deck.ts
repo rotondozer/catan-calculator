@@ -1,5 +1,5 @@
 import * as DevCard from "./dev_card";
-import * as ProgressCard from "./progress_card"
+import * as ProgressCard from "./progress_card";
 import { Maybe } from "seidr";
 
 /**

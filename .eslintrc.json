@@ -5,7 +5,9 @@
 	},
 	"plugins": ["@typescript-eslint"],
 	"rules": {
-		// "indent": ["warn", 6],
+		"indent": ["warn", 2],
+		"no-extra-semi": 1,
+		"semi": "warn",
 		"@typescript-eslint/restrict-plus-operands": "error",
 		"@typescript-eslint/no-empty-interface": [
 			"error",
