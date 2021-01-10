@@ -32,7 +32,7 @@ export class BuildOption extends SumType<{
       Settlement: getNum_,
       City: getNum_,
       DevCard: getNum_,
-      None: () => 0,
+      None: () => 0
     });
   }
 }

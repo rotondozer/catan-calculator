@@ -27,7 +27,7 @@ export class BuildQueue {
           return [currentOpt, ...this.combineAdjacents(queue_.slice(1))];
         }
       },
-      Nothing: () => [currentOpt],
+      Nothing: () => [currentOpt]
     });
   }
 
@@ -35,7 +35,7 @@ export class BuildQueue {
     const updatedQueue = maybe(this.queue.pop()).caseOf({
       Nothing: () => [buildOpt], // queue is empty
       Just: lastOpt =>
-        this.queue.concat(lastOpt.isSameOption(buildOpt) ? lastOpt.merge(buildOpt) : [lastOpt, buildOpt]), // make sure that last opt gets back in there
+        this.queue.concat(lastOpt.isSameOption(buildOpt) ? lastOpt.merge(buildOpt) : [lastOpt, buildOpt]) // make sure that last opt gets back in there
     });
 
     return new BuildQueue(updatedQueue);

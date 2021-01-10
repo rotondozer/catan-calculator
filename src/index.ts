@@ -10,8 +10,8 @@ const testScenario: TestScenario = {
     wood: 0,
     brick: 0,
     ore: 0,
-    sheep: 0,
-  },
+    sheep: 0
+  }
   // devCards, ports, etc. ...
 };
 

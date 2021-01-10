@@ -8,6 +8,7 @@
 		"indent": ["warn", 2],
 		"no-extra-semi": 1,
 		"semi": "warn",
+		"comma-dangle": "warn",
 		"@typescript-eslint/restrict-plus-operands": "error",
 		"@typescript-eslint/no-empty-interface": [
 			"error",
@@ -37,7 +38,6 @@
 	},
 	"ignorePatterns": ["**.test.js", "/tests/**", "build"],
 	"extends": [
-		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
 		"prettier",
 		"prettier/@typescript-eslint"
