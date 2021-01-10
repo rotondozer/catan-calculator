@@ -132,18 +132,18 @@ describe("Hand", () => {
   })
 
   describe("buildMax", () => {
-    let count;
+    let queue;
     beforeEach(() => {
-      count = new BuildQueue();
+      queue = [];
     });
     test("basic", () => {
       const hand = new Hand({ wood: 10, brick: 10 });
-      expect(buildMax(Road(1), { hand, count })).toEqual({ count: new BuildQueue([Road(10)]), hand: new Hand() });
+      expect(buildMax(Road(1), { hand, queue })).toEqual({ queue: [Road(10)], hand: new Hand() });
     });
     test("with leftovers", () => {
       const hand = new Hand({ wood: 11, brick: 10 });
-      expect(buildMax(Road(1), { hand, count })).toEqual({
-        count: new BuildQueue([Road(10)]),
+      expect(buildMax(Road(1), { hand, queue })).toEqual({
+        queue: [Road(10)],
         hand: new Hand({ wood: 1 }),
       });
     });

@@ -1,6 +1,6 @@
 import { BuildOption } from "./build_option";
 import { Result, Ok, Err } from "seidr";
-import { BuildQueue } from "./build_queue";
+import * as BuildQueue from "./build_queue";
 
 type Error = string;
 // TODO: get rid of Resource sumType?
@@ -102,7 +102,7 @@ function hasNegativeNums(hand: Partial<IHand>): boolean {
 }
 
 interface BuildResult {
-	count: BuildQueue;
+	queue: BuildQueue.BuildQueue;
 	hand: Hand;
 }
 /**
@@ -123,7 +123,7 @@ export function buildMax(
       Ok: (h) =>
         buildMax(buildOpt, {
           hand: new Hand(h),
-          count: buildResult.count.add(buildOpt),
+          queue: BuildQueue.add(buildOpt, buildResult.queue),
         }),
     });
 }
