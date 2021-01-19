@@ -1,4 +1,4 @@
-const { buildCoastNodes, buildNode } = require("../../build/game_board/hex");
+const { buildCoastNodes, hasHarbor } = require("../../build/game_board/hex");
 const Harbor = require("../../build/game_board/harbor");
 const Resource = require("../../build/resource");
 const { Just, Maybe, Nothing } = require("seidr");
@@ -38,9 +38,25 @@ describe("Hex", () => {
       const genNodes = buildCoastNodes()
         .filter(node => !node.harbor.equals(Nothing()))
         .filter(node => node.harbor.getOrElse().type === "Generic");
-      
-
+    
       expect(genNodes).toHaveLength(8);
+    });
+
+    it("builds consecutive harbors pairs with a non-harbor on either side", () => {
+      buildCoastNodes().forEach((node, i, coastNodes) => {
+        if (hasHarbor(node)) {
+          const nextNode = coastNodes[i + 1];
+          if (nextNode && hasHarbor(nextNode)) {
+            // make sure it's the same type
+            expect(node.harbor.getOrElse().equals(nextNode.harbor.getOrElse())).toBe(true);
+            // if the one in front hasHarbor, the one behind should not.
+            expect(hasHarbor(coastNodes[i - 1])).toBe(false);
+          } else {
+            // make sure there's a harbor behind if not in front
+            expect(hasHarbor(coastNodes[i - 1])).toBe(true);
+          }
+        }
+      })
     })
   })
 })

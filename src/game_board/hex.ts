@@ -1,4 +1,5 @@
 import { Just, Maybe, Nothing } from "seidr";
+import { v4 as uuidv4 } from "uuid";
 import * as Resource from "../resource";
 import * as Harbor from "./harbor";
 /**
@@ -36,7 +37,7 @@ export function buildHex(overwrites: Partial<Hex> = {}): Hex {
  * a lonely tip on the sea.
  */
 export interface Node {
-  id: number; //   0..maxNode  (for now)
+  id: string;
   isAvailable: boolean;
   hexes: Array<Hex>;
   harbor: Maybe<Harbor.Harbor>;
@@ -44,12 +45,16 @@ export interface Node {
 
 export function buildNode(overwrites: Partial<Node> = {}): Node {
   return { 
-    id: 0, 
+    id: uuidv4(), 
     isAvailable: true, 
     hexes: [], 
     harbor: Nothing(),
     ...overwrites
   };
+}
+
+export function hasHarbor(node: Node): boolean {
+  return node.harbor.type === "Just";
 }
 
 const RESOURCES: Array<Resource.Resource> = [Resource.Brick(0), Resource.Ore(0), Resource.Sheep(0), Resource.Wheat(0), Resource.Wood(0)];
@@ -64,33 +69,33 @@ export function buildCoastNodes(): Array<Node> {
     switch (id + 1) {
       case 2:
       case 3:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[0])), id });
+        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[0])) });
       case 5:
       case 6:
-        return buildNode({ harbor: Just(Harbor.Generic()), id });
+        return buildNode({ harbor: Just(Harbor.Generic()) });
       case 9:
       case 10:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[1])), id });
+        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[1])) });
       case 12:
       case 13:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[2])), id });
+        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[2])) });
       case 15:
       case 16:
-        return buildNode({ harbor: Just(Harbor.Generic()), id });   
+        return buildNode({ harbor: Just(Harbor.Generic()) });   
       case 19:
       case 20:
-        return buildNode({ harbor: Just(Harbor.Generic()), id });
+        return buildNode({ harbor: Just(Harbor.Generic()) });
       case 22:
       case 23:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[3])), id });
+        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[3])) });
       case 26:
       case 27:
-        return buildNode({ harbor: Just(Harbor.Generic()), id });
+        return buildNode({ harbor: Just(Harbor.Generic()) });
       case 29:
       case 30:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[4])), id });
+        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[4])) });
       default:
-        return buildNode({ id });
+        return buildNode();
     }
   });
 }
@@ -102,12 +107,9 @@ export function buildCoastNodes(): Array<Node> {
  * 
  * Harbors need one Node on either side that is not part of another Harbor.
  * This is the *minimum* buffer. I haven't ever seen it exceed 2 on one side, and 1 on the other...
+ * 
+ * @returns 4 additional nodes - the coastNodes array with a Harbor and a buffer on each side.
  */
-// function buildHarborNodesWithBuffer(harbor: Harbor.Harbor, coastNodes: Array<Array>): Array<Node> {
-//   return [buildNode({ id }), buildNode({ id, harbor: Just(harbor) }), buildNode({ id, harbor: Just(harbor) }), buildNode({ id })]
-// }
-
-// function getNextId(nodes: Array<Node>): number {
-//   const highestId = nodes.reduce((high, node) => node.id > high ? node.id : high, 0);
-//   return highestId + 1;
+// function buildHarborNodesWithBuffer(h: Harbor.Harbor, coastNodes: Array<Node>): Array<Node> {
+//   return [...coastNodes, buildNode(), buildNode({ harbor: Just(h) }), buildNode({ harbor: Just(h) }), buildNode()];
 // }

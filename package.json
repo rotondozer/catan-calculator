@@ -1,7 +1,7 @@
 {
 	"name": "catan-calculator",
-  "version": "1.0.0",
-  "author": "Nick Rotondo",
+	"version": "1.0.0",
+	"author": "Nick Rotondo",
 	"license": "ISC",
 	"description": "Settlers of Catan game logic library",
 	"main": "build/index.js",
@@ -17,10 +17,12 @@
 	],
 	"dependencies": {
 		"seidr": "^1.8.0",
-		"sums-up": "^2.2.0"
+		"sums-up": "^2.2.0",
+		"uuid": "^8.3.2"
 	},
 	"devDependencies": {
 		"@types/jest": "^26.0.19",
+		"@types/uuid": "^8.3.0",
 		"@typescript-eslint/eslint-plugin": "^4.11.0",
 		"@typescript-eslint/parser": "^4.11.0",
 		"eslint": "^7.16.0",
