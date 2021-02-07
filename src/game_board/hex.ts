@@ -1,7 +1,7 @@
 import { Just, Maybe, Nothing } from "seidr";
 import { v4 as uuidv4 } from "uuid";
 import * as Resource from "../resource";
-import { flatten, interpose } from "../util/array";
+import { flatten, interpose, insertRandomly } from "../util/array";
 import * as Harbor from "./harbor";
 /**
  *   H H H  
@@ -66,45 +66,12 @@ const RESOURCES: Array<Resource.Resource> = [Resource.Brick(0), Resource.Ore(0),
  */
 export function buildCoastNodes(): Array<Node> {
   const specials = RESOURCES.map(Harbor.Special).map(buildHarborNodesWithBuffer);
+  specials.push([buildNode()]); // concat strips Array, assuming we want it flat
   const generics = Array(4).fill(Harbor.Generic()).map(buildHarborNodesWithBuffer);
+  generics.push([buildNode()]);
 
-  return flatten(interpose(specials, generics));
-  
-  
-
-  return [...Array(30).keys()].map((id) => {
-    switch (id + 1) {
-      case 2:
-      case 3:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[0])) });
-      case 5:
-      case 6:
-        return buildNode({ harbor: Just(Harbor.Generic()) });
-      case 9:
-      case 10:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[1])) });
-      case 12:
-      case 13:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[2])) });
-      case 15:
-      case 16:
-        return buildNode({ harbor: Just(Harbor.Generic()) });   
-      case 19:
-      case 20:
-        return buildNode({ harbor: Just(Harbor.Generic()) });
-      case 22:
-      case 23:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[3])) });
-      case 26:
-      case 27:
-        return buildNode({ harbor: Just(Harbor.Generic()) });
-      case 29:
-      case 30:
-        return buildNode({ harbor: Just(Harbor.Special(RESOURCES[4])) });
-      default:
-        return buildNode();
-    }
-  });
+  const res = insertRandomly([buildNode()], interpose(specials, generics));
+  return flatten(res);
 }
 
 /**
@@ -115,5 +82,5 @@ export function buildCoastNodes(): Array<Node> {
  * @returns 3 nodes - a buffer empty node followed by the pair of ports
  */
 function buildHarborNodesWithBuffer(h: Harbor.Harbor): Array<Node> {
-  return [buildNode(), buildNode({ harbor: Just(h) }), buildNode({ harbor: Just(h) }), buildNode()];
+  return [buildNode(), buildNode({ harbor: Just(h) }), buildNode({ harbor: Just(h) })];
 }

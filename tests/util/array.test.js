@@ -39,8 +39,7 @@ describe("util", () => {
       expect(result3).toHaveLength(2)
       expect(result3).toEqual(expect.arrayContaining([3]))
     })
-    it("adds the element to the array without mutating the original 4", () => {
-      
+    it("adds the element to the array without mutating the original 4", () => {    
       const result4 = insertRandomly(4, Object.freeze([1, 2, 5]))
 
       expect(result4).toHaveLength(4)
