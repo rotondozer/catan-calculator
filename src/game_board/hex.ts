@@ -1,6 +1,7 @@
 import { Just, Maybe, Nothing } from "seidr";
 import { v4 as uuidv4 } from "uuid";
 import * as Resource from "../resource";
+import { flatten, interpose } from "../util/array";
 import * as Harbor from "./harbor";
 /**
  *   H H H  
@@ -62,9 +63,15 @@ const RESOURCES: Array<Resource.Resource> = [Resource.Brick(0), Resource.Ore(0),
  * 5 nodes on each of the 6 sides of the game board.
  * 30 coastal nodes
  * n y y n y y n n y y n y y n y y n n y y n y y n y y n n y y
- * ids are 0-indexed 
  */
 export function buildCoastNodes(): Array<Node> {
+  const specials = RESOURCES.map(Harbor.Special).map(buildHarborNodesWithBuffer);
+  const generics = Array(4).fill(Harbor.Generic()).map(buildHarborNodesWithBuffer);
+
+  return flatten(interpose(specials, generics));
+  
+  
+
   return [...Array(30).keys()].map((id) => {
     switch (id + 1) {
       case 2:
@@ -105,11 +112,8 @@ export function buildCoastNodes(): Array<Node> {
  *  1. trade value (generic@3 or type of resource@2)
  *  2. their Nodes are located *adjacent* to one another on a coast  
  * 
- * Harbors need one Node on either side that is not part of another Harbor.
- * This is the *minimum* buffer. I haven't ever seen it exceed 2 on one side, and 1 on the other...
- * 
- * @returns 4 additional nodes - the coastNodes array with a Harbor and a buffer on each side.
+ * @returns 3 nodes - a buffer empty node followed by the pair of ports
  */
-// function buildHarborNodesWithBuffer(h: Harbor.Harbor, coastNodes: Array<Node>): Array<Node> {
-//   return [...coastNodes, buildNode(), buildNode({ harbor: Just(h) }), buildNode({ harbor: Just(h) }), buildNode()];
-// }
+function buildHarborNodesWithBuffer(h: Harbor.Harbor): Array<Node> {
+  return [buildNode(), buildNode({ harbor: Just(h) }), buildNode({ harbor: Just(h) }), buildNode()];
+}
