@@ -24,8 +24,11 @@ export function flatten<T>(arr: Array<Array<T>>): Array<T> {
   return arr.reduce((acc, cur) => [...acc, ...cur], []);
 }
 
-export function randomInsert<T>(el: T, arr: Array<T>): Array<T> {
-  return arr;
+export function insertRandomly<T>(el: T, arr: Array<T>): Array<T> {
+  const index = getRandomNumberBetween(0, arr.length - 1);
+  const result = [...arr];
+  result.splice(index, 0, el);
+  return result;
 }
 
 export function getRandomNumberBetween(n1: number, n2: number): number {

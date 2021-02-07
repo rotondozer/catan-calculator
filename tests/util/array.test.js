@@ -1,4 +1,4 @@
-const { getRandomNumberBetween, interpose } = require("../../build/util/array.js");
+const { getRandomNumberBetween, interpose, insertRandomly } = require("../../build/util/array.js");
 
 describe("util", () => {
   describe("getRandomNumberBetween", () => {
@@ -19,6 +19,35 @@ describe("util", () => {
       })
     })
   });
+
+  describe("insertRandomly", () => {
+    it("adds the element to the array without mutating the original 1", () => {
+      const result1 = insertRandomly(1, Object.freeze([2, 3, 4, 5]))
+
+      expect(result1).toHaveLength(5)
+      expect(result1).toEqual(expect.arrayContaining([1]))
+    })
+    it("adds the element to the array without mutating the original 2", () => {
+      const result2 = insertRandomly(2, Object.freeze([1, 3]))
+
+      expect(result2).toHaveLength(3)
+      expect(result2).toEqual(expect.arrayContaining([2]))
+    })
+    it("adds the element to the array without mutating the original 3", () => {
+      const result3 = insertRandomly(3, Object.freeze([0]))
+
+      expect(result3).toHaveLength(2)
+      expect(result3).toEqual(expect.arrayContaining([3]))
+    })
+    it("adds the element to the array without mutating the original 4", () => {
+      
+      const result4 = insertRandomly(4, Object.freeze([1, 2, 5]))
+
+      expect(result4).toHaveLength(4)
+      expect(result4).toEqual(expect.arrayContaining([4]))
+    })
+  });
+  
 
   describe("interpose", () => {
     it("works", () => {
